@@ -1,0 +1,277 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "liveNow": true,
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "id": 100,
+      "title": "🌾 VUE GLOBALE DU COMPLEXE AGRICOLE",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "postgres", "uid": "PostgreSQL-Greenhouse" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }
+        }
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 1 },
+      "id": 1,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "auto"
+      },
+      "title": "Serres Surveillées",
+      "type": "stat",
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT COUNT(DISTINCT greenhouse_id) as value FROM latest_measurements;",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "postgres", "uid": "PostgreSQL-Greenhouse" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }
+        }
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 1 },
+      "id": 2,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "reduceOptions": { "calcs": ["lastNotNull"] }
+      },
+      "title": "Capteurs Actifs",
+      "type": "stat",
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) as value FROM latest_measurements;",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "postgres", "uid": "PostgreSQL-Greenhouse" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "orange", "value": 1 },
+              { "color": "red", "value": 3 }
+            ]
+          }
+        }
+      },
+      "gridPos": { "h": 4, "w": 5, "x": 8, "y": 1 },
+      "id": 3,
+      "options": { "colorMode": "value", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "title": "Alertes Actives (Dernières 24h)",
+      "type": "stat",
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) as value FROM greenhouse_alerts WHERE timestamp >= NOW() - INTERVAL '24 hours';",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "postgres", "uid": "PostgreSQL-Greenhouse" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 1 },
+              { "color": "red", "value": 2 }
+            ]
+          }
+        }
+      },
+      "gridPos": { "h": 4, "w": 5, "x": 13, "y": 1 },
+      "id": 4,
+      "options": { "colorMode": "value", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "title": "Serres Nécessitant Irrigation",
+      "type": "stat",
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) as value FROM (SELECT DISTINCT ON (greenhouse_id) irrigation_recommended FROM irrigation_predictions ORDER BY greenhouse_id, timestamp DESC) t WHERE irrigation_recommended = true;",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "postgres", "uid": "PostgreSQL-Greenhouse" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "blue", "value": null }] }
+        }
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 1 },
+      "id": 5,
+      "options": { "colorMode": "value", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "title": "Météo Extérieure (Temp / Hum)",
+      "type": "stat",
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT CONCAT(outdoor_temperature, '°C | ', outdoor_humidity, '%') as value FROM weather_observations ORDER BY timestamp DESC LIMIT 1;",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 },
+      "id": 101,
+      "title": "📊 TÉLÉMÉTRIE TEMPS-RÉEL PAR SERRE",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "postgres", "uid": "PostgreSQL-Greenhouse" },
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 6 },
+      "id": 6,
+      "title": "Température (°C)",
+      "type": "timeseries",
+      "fieldConfig": {
+        "defaults": { "unit": "celsius", "custom": { "lineWidth": 2, "fillOpacity": 15 } }
+      },
+      "targets": [
+        {
+          "format": "time_series",
+          "rawSql": "SELECT timestamp as time, temperature as value, CONCAT(greenhouse_id, ' - ', sensor_id) as metric FROM latest_measurements ORDER BY timestamp ASC;",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "postgres", "uid": "PostgreSQL-Greenhouse" },
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 6 },
+      "id": 7,
+      "title": "Humidité de l'Air (%)",
+      "type": "timeseries",
+      "fieldConfig": {
+        "defaults": { "unit": "percent", "custom": { "lineWidth": 2, "fillOpacity": 15 } }
+      },
+      "targets": [
+        {
+          "format": "time_series",
+          "rawSql": "SELECT timestamp as time, humidity as value, CONCAT(greenhouse_id, ' - ', sensor_id) as metric FROM latest_measurements ORDER BY timestamp ASC;",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "postgres", "uid": "PostgreSQL-Greenhouse" },
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 6 },
+      "id": 8,
+      "title": "Humidité du Sol (%)",
+      "type": "timeseries",
+      "fieldConfig": {
+        "defaults": { "unit": "percent", "custom": { "lineWidth": 2, "fillOpacity": 20 } }
+      },
+      "targets": [
+        {
+          "format": "time_series",
+          "rawSql": "SELECT timestamp as time, soil_moisture as value, CONCAT(greenhouse_id, ' - ', sensor_id) as metric FROM latest_measurements ORDER BY timestamp ASC;",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 14 },
+      "id": 102,
+      "title": "🤖 MACHINE LEARNING & IRRIGATION PRÉDICTIVE (SPARK MLLIB)",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "postgres", "uid": "PostgreSQL-Greenhouse" },
+      "gridPos": { "h": 7, "w": 14, "x": 0, "y": 15 },
+      "id": 9,
+      "title": "Prédictions d'Humidité du Sol à +60 minutes",
+      "type": "table",
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT DISTINCT ON (greenhouse_id) greenhouse_id as \"Serre\", ROUND(current_soil_moisture::numeric, 1) as \"Humidité Actuelle (%)\", ROUND(predicted_moisture_60min::numeric, 1) as \"Prédit à +60min (%)\", CASE WHEN irrigation_recommended THEN '🚨 OUI (Irrigation Requise)' ELSE '✅ NON (Optimal)' END as \"Recommandation\", recommendation_message as \"Analyse Détaillée\", timestamp as \"Dernier Calcul\" FROM irrigation_predictions ORDER BY greenhouse_id, timestamp DESC;",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "postgres", "uid": "PostgreSQL-Greenhouse" },
+      "gridPos": { "h": 7, "w": 10, "x": 14, "y": 15 },
+      "id": 10,
+      "title": "Performance du Modèle MLlib (RandomForest)",
+      "type": "table",
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT model_name as \"Modèle\", version as \"Version\", ROUND(rmse::numeric, 4) as \"RMSE\", ROUND(mae::numeric, 4) as \"MAE\", ROUND(r2::numeric, 4) as \"R² Score\", samples_count as \"Échantillons\", training_timestamp as \"Entraîné le\" FROM model_evaluation_metrics ORDER BY training_timestamp DESC LIMIT 5;",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 22 },
+      "id": 103,
+      "title": "🚨 CENTRE D'ALERTES ET ANOMALIES",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "postgres", "uid": "PostgreSQL-Greenhouse" },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 23 },
+      "id": 11,
+      "title": "Journal des Alertes & Conditions Anormales Détectées",
+      "type": "table",
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT timestamp as \"Date/Heure\", alert_id as \"ID Alerte\", greenhouse_id as \"Serre\", sensor_id as \"Capteur\", parameter as \"Grandeur\", ROUND(value::numeric, 1) as \"Mesure\", ROUND(threshold::numeric, 1) as \"Seuil\", severity as \"Sévérité\", description as \"Détails\" FROM greenhouse_alerts ORDER BY timestamp DESC LIMIT 20;",
+          "refId": "A"
+        }
+      ]
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 38,
+  "style": "dark",
+  "tags": ["iot", "agriculture", "bigdata", "hudi", "spark", "lakehouse"],
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "SMART GREENHOUSE — Agricultural Intelligence Platform",
+  "uid": "smart-greenhouse-main",
+  "version": 1
+}

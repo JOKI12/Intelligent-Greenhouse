@@ -1,0 +1,11 @@
+apiVersion: 1
+
+providers:
+  - name: 'greenhouse-dashboards'
+    orgId: 1
+    folder: 'Serre Agricole'
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /var/lib/grafana/dashboards
