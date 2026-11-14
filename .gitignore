@@ -1,0 +1,30 @@
+# ==============================================================================
+# Git Ignore - Serre Agricole Intelligente
+# ==============================================================================
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.coverage
+htmlcov/
+*.log
+
+# Environment variables
+.env
+
+# Lakehouse local mock storage
+lakehouse/bronze/*
+lakehouse/silver/*
+lakehouse/gold/*
+!lakehouse/bronze/.gitkeep
+!lakehouse/silver/.gitkeep
+!lakehouse/gold/.gitkeep
+
+# Checkpoints and models
+spark/models/*
+!spark/models/.gitkeep
+/tmp/spark_checkpoints/
+
+# Airflow
+airflow/logs/
+airflow/airflow.db
